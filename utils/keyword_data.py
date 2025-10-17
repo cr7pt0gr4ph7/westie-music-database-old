@@ -11,7 +11,7 @@ def _format_tag(category: str, name: str) -> str:
 def _traverse_entry(entry: _KeywordEntry, category: str, tags: list[str], result: dict[str, list[str]]):
     """Visit the given `entry` and its children, and add the resulting word-to-alias mappings to `result`."""
     if isinstance(entry, str):
-        result[entry] = tags if len(tags) > 1 else [*tags, _format_tag(category, str)]
+        result[entry] = tags if len(tags) > 1 else [*tags, _format_tag(category, entry)]
     elif isinstance(entry, dict):
         for tag in entry:
             children = entry[tag]
