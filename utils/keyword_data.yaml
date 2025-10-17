@@ -1,3 +1,10 @@
+colors:
+  context: "#ffd16a" # Light Orange [orange50]
+  level: "#83c9ff" # Light Blue [blue40]
+  genre: "#803df5" # Violet [lightTheme.violetColor]
+  epoch: "#00c0f2" # Turqouise
+  mood: "#29b09d" # Blue-Green [blueGreen80]
+  topic: "#ffabab" # Light Red [red40]
 keywords:
   context:
     # Competitions
@@ -178,7 +185,7 @@ keywords:
 
       # The following genres may require more detailed examination,
       # and may need further information to identify WCS playlists
-    - k-pop:
+    - kpop:
       - kpop
       - k-pop
     - musicals

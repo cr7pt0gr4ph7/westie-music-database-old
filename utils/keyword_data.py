@@ -29,6 +29,7 @@ def _traverse_entry(entry: _KeywordEntry, category: str, tags: list[str], result
         raise TypeError("Neither a str nor a dict")
 
 class _KeywordsFile(TypedDict):
+    colors: dict[str, str]
     keywords: dict[str, list[_KeywordEntry]]
 
 def load_keyword_aliases():
@@ -42,3 +43,10 @@ def load_keyword_aliases():
             _traverse_entry(entry, category, [category], _aliases)
 
     return _aliases
+
+def load_keyword_colors():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{dir_path}/keyword_data.yaml') as stream:
+        raw_data: _KeywordsFile = yaml.safe_load(stream)
+
+    return raw_data['colors']
