@@ -32,7 +32,7 @@ class _KeywordsFile(TypedDict):
     colors: dict[str, str]
     keywords: dict[str, list[_KeywordEntry]]
 
-def load_keyword_aliases():
+def load_keyword_aliases(category_as_tag: bool = False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     with open(f'{dir_path}/keyword_data.yaml') as stream:
         raw_data: _KeywordsFile = yaml.safe_load(stream)
@@ -40,7 +40,7 @@ def load_keyword_aliases():
     _aliases: dict[str, list[str]] = {}
     for category in raw_data['keywords']:
         for entry in raw_data['keywords'][category]:
-            _traverse_entry(entry, category, [category], _aliases)
+            _traverse_entry(entry, category, [category] if category_as_tag else [], _aliases)
 
     return _aliases
 
