@@ -1,10 +1,25 @@
 colors:
+  # context: "#ffd16a" # Light Orange [orange50]
+  # level: "#83c9ff" # Light Blue [blue40]
+  # genre: "#803df5" # Violet [lightTheme.violetColor]
+  # epoch: "#00c0f2" # Turqouise
+  # mood: "#29b09d" # Blue-Green [blueGreen80]
+  # topic: "#ffabab" # Light Red [red40]
   context: "#ffa421" # Orange [lightTheme.orangeColor]
   level: "#0068c9" # Dark Blue [blue80]
   genre: "#803df5" # Violet [lightTheme.violetColor]
   epoch: "#00c0f2" # Turqouise
   mood: "#29b09d" # Blue-Green [blueGreen80]
   topic: "#ffabab" # Light Red [red40]
+  # "#ffa421" # Orange [lightTheme.orangeColor]
+  # "#803df5" # Violet [lightTheme.violetColor]
+  # "#00c0f2" # Turqouise
+  # "#0068c9" # Dark Blue [blue80]
+  # "#29b09d" # Blue-Green [blueGreen80]
+  # "#ff2b2b" # Medium Red [red80]
+  # # "#ff4b4b" # Red [lightTheme.redColor]
+  # "#21c354" # Green [lightTheme.greenColor]
+  # "#a3a8b8" # Gray [lightTheme.grayColor]
 keywords:
   context:
     # Competitions
@@ -51,7 +66,10 @@ keywords:
         - unterricht
         - workshop:
             - intensive:
+                - intensif
+                - intensivdag
                 - intensive
+                - intensivos
             - workshop
             - workshops
             - ws
@@ -161,8 +179,13 @@ keywords:
     - hard
     - pro
     - difficult
+    - complex
+    - simple
   genre:
       # The following genres seem to lead to precise matches
+    - not blues:
+        - no blues
+        - not blues
     - blues
     - bluesy
     - country
@@ -235,15 +258,6 @@ keywords:
         - 7am
     - piano
 
-    # These are qualifiers
-    - fast:
-      - fast
-      - faster
-    - slow:
-      - slow
-      - slower
-    - medium  # "medium fast", # imprecise
-
       # The following terms probably need further investigation.
       # Some of them seem to define "musical feels".
     - fusion  # imprecise
@@ -290,9 +304,15 @@ keywords:
     - chill
     - happy
     - energy
-    - very high energy
-    - high energy
-    - low energy
+    - high energy:
+        - high energy
+        - high energy
+    - medium energy:
+        - medium energy
+        - medium - low energy
+    - low energy:
+        - low energy
+        - medium - low energy
     - rage
     - relaxed:
         - relax
@@ -324,7 +344,9 @@ keywords:
     - emotional
     - feeling
     - guilty
-    - hype
+    - hype:
+        - hype
+        - motivation
     - lucky
     - mellow
     - moody
@@ -338,13 +360,267 @@ keywords:
     # mood or rhythm
     - downbeat
     - upbeat
+  tempo:
+    # These are qualifiers
+    - fast:
+        - fast
+        - faster
+    - slow:
+        - slow
+        - slower
+    - medium:
+        - medium speed
+        - medium tempo
+    - slow?: # imprecise
+        - slow/medium
+        - medium/slow
+    - fast?: # imprecise
+        - medium fast
+        - medium-fast
+        - medium/fast
+        - fast/medium
+    - medium?: # imprecise
+        - slow/medium
+        - medium fast
+        - medium/fast
+        - fast/medium
+  timing:
+    - clear beat # TODO: Avoid matching e.g. "no clear beat"
+    - no clear beat
+    - shuffle?: # imprecise
+       - shuffle
+    - smooth
+    - straight:
+        - straight
+    - swung:
+        - swung
+        - shuffle timing
+        - shuffle rhythm
+        - shuffled swing
+        - clear swing beat
+    - ternary
+    - upbeat and downbeat:
+        - clear down up beat
+        - up beat down beat
+        - up and down beat
   topic:
+    - 12 bar:
+        - 12 bar
+        - 6x8 blues
+    - 32 counts:
+        - 32 bar
+        - 32 counts
+        - 32 ct
+        - 32 beat
+        - 32 beats
+        - 2x32 phrase
+        - 32 phrase
+        - 32er
     - barre
+    - basic
+    - basics
+    - body movement: # see if we can split this up further
+        - intrabody
+        - sharp movement
+        - body movement
+        - body moves
+        - body isolation
+        - isolation
+        - what body part is this
+        - upper body
+        - upper body workshop
+        - body awareness
+        - earth my body
+        - body barre
+        - body talk
+    - body waves:
+        - body roll
+        - body rolls
+        - body wave
+        - body waves
+    - breaks:
+        - breaks
+        - hits & breaks
+        - stopsnbreaks
     - call and response:
         - call
         - response
         - call & response
         - call and response
+    - intensity:
+        - intensité
+        - intensity
+    - micromusciality:
+        - micro musciality
+        - micromusciality
+        - musicality - micro
     - musicality:
+        - muscality
         - musicality
         - musicalité
+    - phrasing:
+        - phrase
+        - phrases
+        - phrased
+        - phrasing
+        - phrase change
+        - phrase changes
+    - structure  # imprecise - discard?
+    - styling:
+        - follower style
+        - leader style
+        - styling
+    - footwork
+    - lyrical
+    - rhythm related:
+        - rhythm
+        - rhythn
+        - rhythmn
+        - rhythms
+    - stretching:
+        - stretch
+        - streching
+    - timing # further investigation needed
+    # - intro # imprecise
+    # - intros # imprecise
+    - long intro:
+        - long intro
+        - long intros
+    - moves # further investication needed
+    # - musique # unrelated
+    - performance # imprecise
+    # misc
+    - double
+    - double triple
+    - double time
+    - single
+    - single time
+  seasonal:
+    - christmas:
+        - "🌲"
+        - "🎅"
+        - "🎅🏼"
+        - "🤶🏻"
+        - "🧑🏻‍🎄"
+        - christmas
+        - god jul
+        - holidays
+        - navidad
+        - noël
+        - x-mas
+        - xmas
+    - autumn: # todo: remove event titles from matches
+        - "🍂"
+        - autumn
+        - fall
+    - halloween: # todo: remove event titles from matches
+        - halloween
+        - spooky
+    - spring: # todo: remove event titles from matches
+        - spring
+    - summer: # todo: remove event titles from matches
+        - beach
+        - pool
+        - summer
+    - winter: # todo: remove event titles from matches#
+        - "☃️"
+        - "❄️"
+        - winter
+  playlist:
+    - favorites:
+        - fav
+        - fave
+        - faves
+        - favorite
+        - favoriter
+        - favorites
+        - favourite
+        - favourites
+        - favs
+        - liked
+        - mit star bewertet
+        - starred
+        - i like
+
+    - hits:
+        - picks
+        - top
+        - anthems
+        - ready
+        - ultimate
+
+    # Playlists with the following keywords in a name have a
+    # higher probability of being a partially unsorted pile
+    # of songs, and as such the tags they assign to songs
+    # should likely get a lower weight.
+    - probably rough tagging:
+        - "& stuff" # "Acoustics & Stuff"
+        - and stuff
+        - dump
+        - misc
+        - maybe
+        - mixed
+        - mostly
+        - no clear
+        - random
+        - sort
+        - test
+        - to try
+        - unsorted
+
+        # Our keyword parsing scheme doesn't deal with negations yet
+        - "but"
+        - "no"
+        - "not"
+
+        # Not all playlists matching the following keywords have
+        # rough tagging, but it's hard to tell them apart based
+        # on their name alone...
+        - experimental
+        - ideas
+        - interesting
+        - listen
+        - listening
+        - memories
+        - possible
+        - potential
+        - trial
+        - some
+        - something
+        - sometime
+        - sometimes
+
+    # Audience requests
+    - suggestions:
+        # - new # but not "new years", "new playlist", "new day"
+        - new wcs
+        - requests
+        - suggestions
+
+    # e.g. "2024 Finds", "Newer finds"
+    - discovery:
+        # - explore # Most matching playlists are called "Explore 5/15/23" and are party playlists...
+        - find
+        - findings
+        - finds
+        - incoming
+        - inspiration
+
+    # Playlists with the following in their name are collections
+    # created by users that indicate a very subjective sorting.
+    - random lists:
+        - stuff # "stuff i like"
+        - i like
+
+    # Playlists that should maybe be stripped from the data
+    - unrelated:
+        - dog walk
+
+    - shazam:
+        - shazam
+        - shazams
+        - shazam-titel
+  events:
+    - westiewaves
+    - swing together
+    - rx
