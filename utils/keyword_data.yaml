@@ -73,8 +73,6 @@ keywords:
     # Parties
     - party:
         - open air
-        - air # "open air"
-        - nights  # "social nights"
         - outdoor
         - party
         - practica
@@ -83,6 +81,7 @@ keywords:
         - praktis
         - pratique
         - social
+        - social nights
         - socialdans
         - socials
         - soiree
@@ -97,7 +96,7 @@ keywords:
         - treino
 
     # WCS Rally / Flashmob
-    - flashmob:
+    - rally:
         - flashmob
         - rally
 
@@ -191,32 +190,34 @@ keywords:
 
     # Review these
     - indie
-    - soundtrack
-    - soundtrack)
+    - soundtrack:
+        - soundtrack
+        - motion picture
     - lyrics
 
     # These aren't exactly music genres, but have a very
     # similar meaning in the context of West Coast Swing
     - acoustic
-    - cover
-    - covers
+    - cover:
+      - cover
+      - covers
     - funky
     - guitar
     - instrumental
     - late night:
-        - late
-        - night
-        - nite
         - late night
         - late nite
         - latenight
+        - latenite
     - piano
 
     # These are qualifiers
-    - fast
-    - faster
-    - slow
-    - slower
+    - fast:
+      - fast
+      - faster
+    - slow:
+      - slow
+      - slower
     - medium  # "medium fast", # imprecise
 
       # The following terms probably need further investigation.
@@ -264,22 +265,33 @@ keywords:
     - calm
     - chill
     - happy
-    - high "energy", "high energy",
+    - energy
+    - very high energy
+    - high energy
+    - low energy
     - rage
-    - relax "relaxing",
+    - relaxed:
+        - relax
+        - relaxed
+        - relaxing
     - sad
     - sexy
     # "warm", # -"warm up" # imprecise without further filtering
 
     # Need further investigation
-    - good
+    - nice
+    - good:
+        - good
+        - gut
+        - gute
     - vibes
-    - good vibes
-    - good
+    - good vibes:
+        - good vibe
+        - good vibes
+        - gute vibes
+        - nice vibes
     - morning
     - good morning
-    - gute
-    - nice
     - power
 
     # Also need more investigation
@@ -302,3 +314,13 @@ keywords:
     # mood or rhythm
     - downbeat
     - upbeat
+  topic:
+    - barre
+    - call and response:
+        - call
+        - response
+        - call & response
+        - call and response
+    - musicality:
+        - musicality
+        - musicalité
