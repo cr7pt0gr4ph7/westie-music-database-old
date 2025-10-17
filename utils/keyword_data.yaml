@@ -1,6 +1,6 @@
 colors:
-  context: "#ffd16a" # Light Orange [orange50]
-  level: "#83c9ff" # Light Blue [blue40]
+  context: "#ffa421" # Orange [lightTheme.orangeColor]
+  level: "#0068c9" # Dark Blue [blue80]
   genre: "#803df5" # Violet [lightTheme.violetColor]
   epoch: "#00c0f2" # Turqouise
   mood: "#29b09d" # Blue-Green [blueGreen80]
