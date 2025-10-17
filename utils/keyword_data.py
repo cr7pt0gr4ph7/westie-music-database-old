@@ -5,21 +5,30 @@ import yaml
 
 type _KeywordEntry = str | dict[str, str | None | list[_KeywordEntry]]
 
+
 def _format_tag(category: str, name: str) -> str:
     return f'{category}:{name}'
 
-def _traverse_entry(entry: _KeywordEntry, category: str, tags: list[str], result: dict[str, list[str]]):
+
+def _append_all[Key, Value](mapping: dict[Key, set[Value]], key: Key, values: list[Value]):
+    if key in mapping:
+        mapping[key].update(values)
+    else:
+        mapping[key] = set(values)
+
+
+def _traverse_entry(entry: _KeywordEntry, category: str, tags: set[str], result: dict[str, set[str]]):
     """Visit the given `entry` and its children, and add the resulting word-to-alias mappings to `result`."""
     if isinstance(entry, str):
-        result[entry] = tags if len(tags) > 1 else [*tags, _format_tag(category, entry)]
+        _append_all(result, entry, tags if len(tags) > 1 else [*tags, _format_tag(category, entry)])
     elif isinstance(entry, dict):
         for tag in entry:
             children = entry[tag]
             child_tags = [*tags, _format_tag(category, tag)]
             if children is None:
-                result[tag] = tags
+                _append_all(result, tag, tags)
             elif isinstance(children, str):
-                result[children] = tags
+                _append_all(result, children, tags)
             elif isinstance(children, list):
                 for child in children:
                     _traverse_entry(child, category, child_tags, result)
@@ -28,21 +37,24 @@ def _traverse_entry(entry: _KeywordEntry, category: str, tags: list[str], result
     else:
         raise TypeError("Neither a str nor a dict")
 
+
 class _KeywordsFile(TypedDict):
     colors: dict[str, str]
     keywords: dict[str, list[_KeywordEntry]]
+
 
 def load_keyword_aliases(category_as_tag: bool = False):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     with open(f'{dir_path}/keyword_data.yaml') as stream:
         raw_data: _KeywordsFile = yaml.safe_load(stream)
 
-    _aliases: dict[str, list[str]] = {}
+    _aliases: dict[str, set[str]] = {}
     for category in raw_data['keywords']:
         for entry in raw_data['keywords'][category]:
             _traverse_entry(entry, category, [category] if category_as_tag else [], _aliases)
 
     return _aliases
+
 
 def load_keyword_colors():
     dir_path = os.path.dirname(os.path.realpath(__file__))
