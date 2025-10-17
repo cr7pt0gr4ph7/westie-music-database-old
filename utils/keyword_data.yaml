@@ -216,6 +216,23 @@ keywords:
         - late nite
         - latenight
         - latenite
+        # The terms below are for matching all the late night
+        # DJ sets from events that have the time in their name
+        - 02:00
+        - 03:00
+        - 04:00
+        - 05:00
+        - 06:00
+        # - 1am
+        - 2am
+        - 2:30am
+        - 2-4am
+        - 3am
+        - 4am
+        - 4:30am
+        - 5am
+        - 6am
+        - 7am
     - piano
 
     # These are qualifiers
