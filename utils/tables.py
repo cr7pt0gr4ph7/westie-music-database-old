@@ -1,5 +1,5 @@
 """Provides typed column name constants."""
-from typing import Final
+from typing import Final, Literal
 
 import polars as pl
 
@@ -243,8 +243,11 @@ class Tag(Entity):
     playlist_names: Final = Playlist.name.list()
     """The names of some (but not all) playlists that have this tag."""
 
-    song_count = Stats.song_count.alias('tag.song_count')
+    song_count = Stats.song_count
     """How many songs have this tag."""
+
+    type SortFields = Literal['playlist_count', 'song_count', 'tag', 'category', 'full_tag']
+    """Fields that tags can be sorted on."""
 
 class TrackTag(Entity):
     """Represents the association between a single tag and a single track."""
