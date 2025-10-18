@@ -14,7 +14,7 @@ from utils.common.columns import pull_columns_to_front
 from utils.common.logging import log_query
 from utils.keyword_data import load_keyword_colors
 from utils.pull_data import automatically_pull_data_if_needed
-from utils.search import SearchEngine
+from utils.search import SearchEngine, TRACK_TAGS_DATA_FILE
 from utils.tables import Playlist, PlaylistOwner, PlaylistTrack, Stats, Track, TrackAdjacent, TrackLyrics
 
 # As mentioned in the streamlit docs pyplot doesn't work well with threads,
@@ -121,33 +121,6 @@ st.write(f"{djs_count:,}   Westies/DJs\n\n")
 
 st.link_button("Help fill in country info!",
                url='https://docs.google.com/spreadsheets/d/1YQaWwtIy9bqSNTXR9GrEy86Ix51cvon9zzHVh7sBi0A/edit?usp=sharing')
-
-
-late_night_df = pl.scan_parquet('notebooks/acoustic_tags.parquet')\
-    .with_row_index(offset=1)
-
-st.dataframe(late_night_df.select('track.name',
-                                  'track.artists',
-                                  'tag',
-                                  'matching_playlist_count',
-                                  'tag.playlist_percent',
-                                  'tag.playlist_count',
-                                  'track.playlist_percent',
-                                  'track.playlist_count'),
-             column_config={'matching_playlist_count': st.column_config.NumberColumn('#'),
-                            'tag.playlist_count': st.column_config.NumberColumn('# tag'),
-                            'tag.playlist_percent': st.column_config.ProgressColumn('% tag'),
-                            'track.playlist_count': st.column_config.NumberColumn('# track'),
-                            'track.playlist_percent': st.column_config.ProgressColumn('% track')})
-
-late_night_df = late_night_df\
-    .limit(500)\
-    .select(pl.all().name.map(lambda x: x.replace('.', '_')))
-
-st.bar_chart(late_night_df, x='index', y='matching_playlist_count', sort=False)
-st.bar_chart(late_night_df, x='index', y='tag_playlist_percent', sort=False)
-st.bar_chart(late_night_df, x='index', y='track_playlist_count', sort=False)
-st.bar_chart(late_night_df, x='index', y='track_playlist_percent', sort=False)
 
 
 # Feature flag to enable the "Random Song" section
@@ -736,6 +709,62 @@ if keyword_insights_toggle:
                  'tag': st.column_config.MultiselectColumn(None, options=tags, color=tag_colors),
                  'full_tag': st.column_config.MultiselectColumn(None, options=full_tags, color=tag_colors),
                  })
+
+    st.markdown(f"#### ")
+    st.markdown(f"#### Tagged songs")
+
+    tag_input = st.selectbox("Show songs with tag:", options=full_tags,
+                             format_func=lambda tag: ': '.join(tag.split(':')).title())
+
+    if tag_input:
+        tagged_songs_df = pl.scan_parquet(TRACK_TAGS_DATA_FILE)\
+            .explode('tag', 'playlist_counts')\
+            .filter(pl.col('tag').eq(tag_input))\
+            .rename({'playlist_count': 'track.sum_of_playlist_count_over_all_tags',
+                     'playlist_counts': 'matching_playlist_count'})\
+            .join(search_engine.data.tracks.select('track.id', 'playlist_count'), how='inner', on='track.id')\
+            .join(search_engine.find_tags(playlist_limit=0).select('full_tag', pl.col('playlist_count').alias('tag.playlist_count')),
+                  how='inner', left_on='tag', right_on='full_tag')\
+            .rename({'playlist_count': 'track.playlist_count'})\
+            .sort('matching_playlist_count', descending=True)\
+            .select('track.id',
+                    'tag',
+                    'matching_playlist_count',
+                    (pl.col('matching_playlist_count') / pl.col('tag.playlist_count')).alias('tag.playlist_percent'),
+                    'tag.playlist_count',
+                    # TODO: The best metric would probably be to compare matching_playlist_count to
+                    #       the number of playlists with this track that have at least one genre tag
+                    #       resp. another tag from the same category
+                    (pl.col('matching_playlist_count') / pl.col('track.playlist_count')).alias('track.playlist_percent'),
+                    'track.playlist_count',
+                    'track.name',
+                    'track.artists')\
+            .with_row_index(offset=1)\
+            .collect(engine='streaming')
+
+        st.dataframe(tagged_songs_df.select('track.name',
+                                            'track.artists',
+                                            'tag',
+                                            'matching_playlist_count',
+                                            'tag.playlist_percent',
+                                            'tag.playlist_count',
+                                            'track.playlist_percent',
+                                            'track.playlist_count'),
+                     column_config={'tag': st.column_config.MultiselectColumn(None, options=full_tags, color=tag_colors),
+                                    'matching_playlist_count': st.column_config.NumberColumn('#'),
+                                    'tag.playlist_count': st.column_config.NumberColumn('# tag'),
+                                    'tag.playlist_percent': st.column_config.ProgressColumn('% tag'),
+                                    'track.playlist_count': st.column_config.NumberColumn('# track'),
+                                    'track.playlist_percent': st.column_config.ProgressColumn('% track')})
+
+        tagged_songs_df = tagged_songs_df\
+            .limit(500)\
+            .select(pl.all().name.map(lambda x: x.replace('.', '_')))
+
+        st.bar_chart(tagged_songs_df, x='index', y='matching_playlist_count', sort=False)
+        st.bar_chart(tagged_songs_df, x='index', y='tag_playlist_percent', sort=False)
+        st.bar_chart(tagged_songs_df, x='index', y='track_playlist_count', sort=False)
+        st.bar_chart(tagged_songs_df, x='index', y='track_playlist_percent', sort=False)
 
 
 @st.cache_data
