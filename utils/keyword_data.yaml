@@ -76,7 +76,10 @@ keywords:
 
     # Routines
     - routine:
-        - proam
+        - proam:
+            - proam
+            - pro-am
+            - pro am
         - rising
         - rising star
         - routine
@@ -94,6 +97,13 @@ keywords:
         - warmups
         - warm up
         - warm-up
+
+    # Cool down
+    - cool down:
+        - cooldown
+        - cool down
+        - cool-down
+        - cool off
 
     # Parties
     - party:
@@ -149,8 +159,8 @@ keywords:
   level:
     # These can mean competition or difficulity levels
     - all-star:
-      - all-star
-      - all star
+        - all-star
+        - all star
     - advanced:
         - adv
         - advanced
@@ -182,7 +192,7 @@ keywords:
     - complex
     - simple
   genre:
-      # The following genres seem to lead to precise matches
+    # The following genres seem to lead to precise matches
     - not blues:
         - no blues
         - not blues
@@ -201,22 +211,21 @@ keywords:
     - punk
     - rap
     - r&b:
-      - rnb
-      - r&b
-    - rock  # "soft rock", "alternative rock", "pop rock",
+        - rnb
+        - r&b
+    - rock # "soft rock", "alternative rock", "pop rock",
     - soul
 
       # The following genres may require more detailed examination,
       # and may need further information to identify WCS playlists
     - kpop:
-      - kpop
-      - k-pop
+        - kpop
+        - k-pop
+    - broadway
     - musicals
     - jazz
     - pop
     - trance
-    - old  # imprecise # old school
-    - old school
 
     # Review these
     - indie
@@ -229,9 +238,8 @@ keywords:
     # similar meaning in the context of West Coast Swing
     - acoustic
     - covers:
-      - cover
-      - covers
-    - funky
+        - cover
+        - covers
     - guitar
     - instrumental
     - late night:
@@ -241,18 +249,18 @@ keywords:
         - latenite
         # The terms below are for matching all the late night
         # DJ sets from events that have the time in their name
-        - 02:00
-        - 03:00
-        - 04:00
-        - 05:00
-        - 06:00
+        - "02:00"
+        - "03:00"
+        - "04:00"
+        - "05:00"
+        - "06:00"
         # - 1am
         - 2am
-        - 2:30am
+        - "2:30am"
         - 2-4am
         - 3am
         - 4am
-        - 4:30am
+        - "4:30am"
         - 5am
         - 6am
         - 7am
@@ -260,28 +268,28 @@ keywords:
 
       # The following terms probably need further investigation.
       # Some of them seem to define "musical feels".
-    - fusion  # imprecise
-    - groovy  # -"groovy tuesdays"?
+    - fusion # imprecise
+    - groovy # -"groovy tuesdays"?
     - smooth
     - triple
-    - step  # "step step"
+    - step # "step step"
     - walk
   epoch:
     # These classifications are based on time frames instead of genres
     - 70s:
-      - 70s
-      - 70's
+        - 70s
+        - 70's
     - 80s:
-      - 80s
-      - 80's,
+        - 80s
+        - 80's,
     - 90s:
-      - 90s
-      - 90's
+        - 90s
+        - 90's
     - 2000s: 2000s
     # ----------------
     - contemporary:
-      - contemp
-      - contemporary # slow contemorary
+        - contemp
+        - contemporary # slow contemorary
     - modern: modern # imprecise
     # "now",  # imprecise
     # ----------------
@@ -290,14 +298,12 @@ keywords:
     - oldies: oldies
     - retro: retro
     - throwback:
-      - throwback
-      - throwbacks
-    # ----------------
-    - hit:
-      - hit
-      - hits
-      - bangers
-      - popular
+        - throwback
+        - throwbacks
+    - old school:
+        - old school
+        - old times
+
   mood:
     # These aren't musical genres but moods
     - calm
@@ -313,16 +319,22 @@ keywords:
     - low energy:
         - low energy
         - medium - low energy
+    - mellow:
+        - mellow
+        - mellowmellowmellow
     - rage
     - relaxed:
         - relax
         - relaxed
         - relaxing
+        - laid back
     - sad
     - sexy
     # "warm", # -"warm up" # imprecise without further filtering
 
     # Need further investigation
+    - funky
+    - groovy
     - nice
     - good:
         - good
@@ -362,6 +374,9 @@ keywords:
     - upbeat
   tempo:
     # These are qualifiers
+    - fast-:
+        - not fast
+        - not too fast
     - fast:
         - fast
         - faster
@@ -386,9 +401,11 @@ keywords:
         - fast/medium
   timing:
     - clear beat # TODO: Avoid matching e.g. "no clear beat"
+    - clear beat-:
+        - no clear beat
     - no clear beat
     - shuffle?: # imprecise
-       - shuffle
+        - shuffle
     - smooth
     - straight:
         - straight
@@ -399,6 +416,8 @@ keywords:
         - shuffled swing
         - clear swing beat
     - ternary
+    - staccato
+    - legato
     - upbeat and downbeat:
         - clear down up beat
         - up beat down beat
@@ -416,6 +435,9 @@ keywords:
         - 2x32 phrase
         - 32 phrase
         - 32er
+    - accents:
+        - accent
+        - accents
     - barre
     - basic
     - basics
@@ -442,6 +464,7 @@ keywords:
         - breaks
         - hits & breaks
         - stopsnbreaks
+        - stops
     - call and response:
         - call
         - response
@@ -465,7 +488,7 @@ keywords:
         - phrasing
         - phrase change
         - phrase changes
-    - structure  # imprecise - discard?
+    - structure # imprecise - discard?
     - styling:
         - follower style
         - leader style
@@ -527,6 +550,12 @@ keywords:
         - "❄️"
         - winter
   playlist:
+    - ordered:
+        - decreasing
+        - increasing
+        - ordered
+        - sorted by
+
     - favorites:
         - fav
         - fave
@@ -543,10 +572,14 @@ keywords:
         - i like
 
     - hits:
-        - picks
-        - top
         - anthems
+        - bangers
+        - hit
+        - hits
+        - picks
+        - popular
         - ready
+        - top
         - ultimate
 
     # Playlists with the following keywords in a name have a
@@ -598,7 +631,7 @@ keywords:
         - suggestions
 
     # e.g. "2024 Finds", "Newer finds"
-    - discovery:
+    - discoveries:
         # - explore # Most matching playlists are called "Explore 5/15/23" and are party playlists...
         - find
         - findings
@@ -614,13 +647,19 @@ keywords:
 
     # Playlists that should maybe be stripped from the data
     - unrelated:
+        - kids
         - dog walk
+        - hip hop kids
+        - hip hop choreos
 
     - shazam:
         - shazam
         - shazams
         - shazam-titel
   events:
-    - westiewaves
-    - swing together
+    - groovy tuesdays
     - rx
+    - swing together
+    - tanzbogen
+    - westiewaves
+    - wotp
