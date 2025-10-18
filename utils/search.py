@@ -1111,13 +1111,13 @@ class SearchEngine:
                     Tag.playlist_names)
 
         if category_name:
-            tags = tags.filter(pl.col(Tag.category).contains_any(category_name.to_lowercase().strip().split(',')))
+            tags = tags.filter(Tag.category().str.contains_any(category_name.to_lowercase().strip().split(',')))
 
         if tag_name:
-            tags = tags.filter(pl.col(Tag.name).contains_any(tag_name.to_lowercase().strip().split(',')))
+            tags = tags.filter(Tag.name().str.contains_any(tag_name.to_lowercase().strip().split(',')))
 
         if min_playlist_count is not None:
-            tags = tags.filter(pl.col(Tag.playlist_count).ge(min_playlist_count))
+            tags = tags.filter(Tag.playlist_count().ge(min_playlist_count))
 
         if sort_by is not None:
             descending = (descending if descending is not None else
