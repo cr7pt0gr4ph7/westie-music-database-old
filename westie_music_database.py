@@ -15,7 +15,7 @@ from utils.common.logging import log_query
 from utils.keyword_data import load_keyword_colors
 from utils.pull_data import automatically_pull_data_if_needed
 from utils.search import SearchEngine, TRACK_TAGS_DATA_FILE
-from utils.tables import Playlist, PlaylistOwner, PlaylistTrack, Stats, Track, TrackAdjacent, TrackLyrics
+from utils.tables import Playlist, PlaylistOwner, PlaylistTrack, Stats, Track, TrackAdjacent, TrackLyrics, TrackTag
 
 # As mentioned in the streamlit docs pyplot doesn't work well with threads,
 # so use a lock to protect it (as recommeded by the streamlit documentation)
@@ -717,45 +717,25 @@ if keyword_insights_toggle:
                              format_func=lambda tag: ': '.join(tag.split(':')).title())
 
     if tag_input:
-        tagged_songs_df = pl.scan_parquet(TRACK_TAGS_DATA_FILE)\
-            .explode('tag', 'playlist_counts')\
-            .filter(pl.col('tag').eq(tag_input))\
-            .rename({'playlist_count': 'track.sum_of_playlist_count_over_all_tags',
-                     'playlist_counts': 'matching_playlist_count'})\
-            .join(search_engine.data.tracks.select('track.id', 'playlist_count'), how='inner', on='track.id')\
-            .join(search_engine.find_tags(playlist_limit=0).select('full_tag', pl.col('playlist_count').alias('tag.playlist_count')),
-                  how='inner', left_on='tag', right_on='full_tag')\
-            .rename({'playlist_count': 'track.playlist_count'})\
-            .sort('matching_playlist_count', descending=True)\
-            .select('track.id',
-                    'tag',
-                    'matching_playlist_count',
-                    (pl.col('matching_playlist_count') / pl.col('tag.playlist_count')).alias('tag.playlist_percent'),
-                    'tag.playlist_count',
-                    # TODO: The best metric would probably be to compare matching_playlist_count to
-                    #       the number of playlists with this track that have at least one genre tag
-                    #       resp. another tag from the same category
-                    (pl.col('matching_playlist_count') / pl.col('track.playlist_count')).alias('track.playlist_percent'),
-                    'track.playlist_count',
-                    'track.name',
-                    'track.artists')\
+        tagged_songs_df = search_engine\
+            .find_songs_by_tag(tag_name_exact=tag_input)\
             .with_row_index(offset=1)\
             .collect(engine='streaming')
 
-        st.dataframe(tagged_songs_df.select('track.name',
-                                            'track.artists',
-                                            'tag',
-                                            'matching_playlist_count',
-                                            'tag.playlist_percent',
-                                            'tag.playlist_count',
-                                            'track.playlist_percent',
-                                            'track.playlist_count'),
-                     column_config={'tag': st.column_config.MultiselectColumn(None, options=full_tags, color=tag_colors),
-                                    'matching_playlist_count': st.column_config.NumberColumn('#'),
-                                    'tag.playlist_count': st.column_config.NumberColumn('# tag'),
-                                    'tag.playlist_percent': st.column_config.ProgressColumn('% tag'),
-                                    'track.playlist_count': st.column_config.NumberColumn('# track'),
-                                    'track.playlist_percent': st.column_config.ProgressColumn('% track')})
+        st.dataframe(tagged_songs_df.select(TrackTag.Track.name,
+                                            TrackTag.Track.artist,
+                                            TrackTag.tag,
+                                            TrackTag.matching_playlist_count,
+                                            TrackTag.Tag.playlist_percent,
+                                            TrackTag.Tag.playlist_count,
+                                            TrackTag.Track.playlist_percent,
+                                            TrackTag.Track.playlist_count),
+                     column_config={TrackTag.tag: st.column_config.MultiselectColumn(None, options=full_tags, color=tag_colors),
+                                    TrackTag.matching_playlist_count: st.column_config.NumberColumn('#'),
+                                    TrackTag.Tag.playlist_count: st.column_config.NumberColumn('# tag'),
+                                    TrackTag.Tag.playlist_percent: st.column_config.ProgressColumn('% tag'),
+                                    TrackTag.Track.playlist_count: st.column_config.NumberColumn('# track'),
+                                    TrackTag.Track.playlist_percent: st.column_config.ProgressColumn('% track')})
 
         tagged_songs_df = tagged_songs_df\
             .limit(500)\

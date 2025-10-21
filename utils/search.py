@@ -1122,6 +1122,47 @@ class SearchEngine:
 
         return tags.slice(0, limit)
 
+    def find_songs_by_tag(
+            self,
+            *,
+            tag_name_exact: str,
+            limit: int | None = None,
+    ) -> pl.LazyFrame:
+        track_tags = self.data.track_tags\
+            .explode(TrackTags.tags.alias(TrackTag.tag),
+                     TrackTags.playlist_counts.alias(TrackTag.matching_playlist_count))\
+            .rename({TrackTags.tag_relations_count: 'track.tag_relations_count'})
+
+        # Do not perform search if tag_name_exact is None or empty, as that returns too many entries
+        if not tag_name_exact:
+            raise ValueError("Must specify tag_name_exact when using find_songs_by_tag")
+
+        if tag_name_exact is not None:
+            track_tags = track_tags\
+                .filter(pl.col(TrackTag.tag).eq(tag_name_exact))
+
+        return track_tags\
+            .join(self.data.tracks.select(Track.id, Stats.playlist_count), how='inner', on=Track.id)\
+            .join(self.find_tags(playlist_limit=0).select('full_tag', pl.col('playlist_count').alias('tag.playlist_count')),
+                  how='inner', left_on='tag', right_on='full_tag')\
+            .rename({Stats.playlist_count: 'track.playlist_count'})\
+            .sort('matching_playlist_count', descending=True)\
+            .select(TrackTag.Track.id,
+                    TrackTag.Tag.name,
+                    TrackTag.matching_playlist_count,
+                    (pl.col(TrackTag.matching_playlist_count) /
+                     pl.col(TrackTag.Tag.playlist_count)).alias(TrackTag.Tag.playlist_percent),
+                    TrackTag.Tag.playlist_count,
+                    # TODO: The best metric would probably be to compare matching_playlist_count to
+                    #       the number of playlists with this track that have at least one genre tag
+                    #       resp. another tag from the same category
+                    (pl.col(TrackTag.matching_playlist_count) /
+                     pl.col(TrackTag.Track.playlist_count)).alias(TrackTag.Track.playlist_percent),
+                    TrackTag.Track.playlist_count,
+                    TrackTag.Track.name,
+                    TrackTag.Track.artists)\
+            .slice(0, limit or None)
+
     def find_random_songs(
         self,
         *,
