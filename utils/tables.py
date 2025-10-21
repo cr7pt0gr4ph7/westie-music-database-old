@@ -277,11 +277,11 @@ class TrackTags(Entity):
     tags: Final = Tag.name.list().alias("tags")
     """The list of tags of the song."""
 
-    playlist_counts: Final = field("playlist_counts", pl.List(pl.UInt32))
+    playlist_counts_per_tag: Final = field("playlist_counts_per_tag", pl.List(pl.UInt32))
     """How often each tag is associated with this song. Has same length and order as `tags`."""
 
     tag_relations_count: Final = field("tag_relations_count", pl.UInt32)
-    """The total number of `(Track=this_track, Tag, Playlist)` tuples. Same as `sum(playlist_counts)`."""
+    """The total number of `(Track=this_track, Tag, Playlist)` tuples. Same as `sum(playlist_counts_per_tag)`."""
 
 
 class PlaylistTags(Entity):

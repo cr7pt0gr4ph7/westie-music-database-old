@@ -765,7 +765,8 @@ def process_playlist_and_song_tags():
                 .join(tracks_batch, how='semi', on=Track.id)\
                 .group_by(Track.id)\
                 .agg(pl.col(Tag.name).sort_by(Stats.playlist_count, descending=True).head(20),
-                     pl.col(Stats.playlist_count).sort(descending=True).head(20).alias(TrackTags.playlist_counts),
+                     pl.col(Stats.playlist_count).sort(descending=True).head(
+                         20).alias(TrackTags.playlist_counts_per_tag),
                      pl.col(Stats.playlist_count).sort(descending=True).head(20).sum().alias(TrackTags.tag_relations_count))\
                 .join(tracks_batch.select(Track.id, Track.name, Track.artists), how='inner', on=Track.id)
 
@@ -808,7 +809,7 @@ def merge_playlist_tags_into_metadata():
     playlists = scan_parquet_file(UNTAGGED_PLAYLISTS_DATA_FILE)
     playlist_tags = scan_parquet_file(PLAYLIST_TAGS_DATA_FILE)
     playlists_with_tags = playlists\
-        .join(playlist_tags, how='left', on=Playlist.id)\
+        .join(playlist_tags.select(Playlist.id, PlaylistTags.tags), how='left', on=Playlist.id)\
         .sort(Playlist.id)
 
     write_to_parquet_file(playlists_with_tags, PLAYLIST_DATA_FILE)
@@ -821,7 +822,10 @@ def merge_song_tags_into_metadata():
     tracks = scan_parquet_file(UNTAGGED_TRACKS_DATA_FILE)
     track_tags = scan_parquet_file(TRACK_TAGS_DATA_FILE)
     tracks_with_tags = tracks\
-        .join(track_tags.drop(Track.name, Track.artists),
+        .join(track_tags.select(Track.id,
+                                TrackTags.tags,
+                                TrackTags.playlist_counts_per_tag,
+                                TrackTags.tag_relations_count),
               how='left', on=Track.id)\
         .sort(Track.id)
 

@@ -1130,7 +1130,7 @@ class SearchEngine:
     ) -> pl.LazyFrame:
         track_tags = self.data.track_tags\
             .explode(TrackTags.tags.alias(TrackTag.tag),
-                     TrackTags.playlist_counts.alias(TrackTag.matching_playlist_count))\
+                     TrackTags.playlist_counts_per_tag.alias(TrackTag.matching_playlist_count))\
             .rename({TrackTags.tag_relations_count: 'track.tag_relations_count'})
 
         # Do not perform search if tag_name_exact is None or empty, as that returns too many entries
