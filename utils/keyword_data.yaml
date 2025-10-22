@@ -196,6 +196,9 @@ keywords:
     - not blues:
         - no blues
         - not blues
+    - blues-:
+        - no blues
+        - not blues
     - blues
     - bluesy
     - country
@@ -232,7 +235,6 @@ keywords:
     - soundtrack:
         - soundtrack
         - motion picture
-    - lyrics
 
     # These aren't exactly music genres, but have a very
     # similar meaning in the context of West Coast Swing
@@ -241,7 +243,9 @@ keywords:
         - cover
         - covers
     - guitar
-    - instrumental
+    - instrumental:
+        - instrumental
+        - without lyrics
     - late night:
         - late night
         - late nite
@@ -270,10 +274,6 @@ keywords:
       # Some of them seem to define "musical feels".
     - fusion # imprecise
     - groovy # -"groovy tuesdays"?
-    - smooth
-    - triple
-    - step # "step step"
-    - walk
   epoch:
     # These classifications are based on time frames instead of genres
     - 70s:
@@ -494,7 +494,11 @@ keywords:
         - leader style
         - styling
     - footwork
-    - lyrical
+    - lyrical:
+        - lyrical
+    - lyrics
+    - lyrics-:
+        - without lyrics
     - rhythm related:
         - rhythm
         - rhythn
@@ -518,6 +522,12 @@ keywords:
     - double time
     - single
     - single time
+    - triple
+    - triplestep
+    - walks:
+        - walks
+        - walk walk
+        - step step
   seasonal:
     - christmas:
         - "🌲"
