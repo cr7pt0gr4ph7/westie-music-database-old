@@ -15,7 +15,7 @@ from utils.common.logging import log_query
 from utils.keyword_data import load_keyword_colors
 from utils.pull_data import automatically_pull_data_if_needed
 from utils.search import SearchEngine, TRACK_TAGS_DATA_FILE
-from utils.tables import Playlist, PlaylistOwner, PlaylistTrack, Stats, Track, TrackAdjacent, TrackLyrics, TrackTag
+from utils.tables import Playlist, PlaylistOwner, PlaylistTrack, Stats, Tag, Track, TrackAdjacent, TrackLyrics, TrackTag
 
 # As mentioned in the streamlit docs pyplot doesn't work well with threads,
 # so use a lock to protect it (as recommeded by the streamlit documentation)
@@ -639,7 +639,9 @@ if keyword_insights_toggle:
             min_font_size=10
         ).generate_from_frequencies({
             row[0]: float(row[1])
-            for row in tags_df.filter(pl.col('tag').is_not_null()).select('tag', Stats.playlist_count).iter_rows()
+            for row in (tags_df
+                        .filter(pl.col(Tag.short_name).is_not_null())
+                        .select(Tag.short_name, Tag.playlist_count).iter_rows())
         })
 
         # As mentioned in the streamlit docs pyplot doesn't work well with threads,
@@ -722,8 +724,8 @@ if keyword_insights_toggle:
             .with_row_index(offset=1)\
             .collect(engine='streaming')
 
-        st.dataframe(tagged_songs_df.select(TrackTag.Track.name,
-                                            TrackTag.Track.artist,
+        st.dataframe(tagged_songs_df.select(Track.name,
+                                            Track.artists,
                                             TrackTag.tag,
                                             TrackTag.matching_playlist_count,
                                             TrackTag.Tag.playlist_percent,

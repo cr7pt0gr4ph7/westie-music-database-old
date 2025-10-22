@@ -1128,10 +1128,11 @@ class SearchEngine:
             tag_name_exact: str,
             limit: int | None = None,
     ) -> pl.LazyFrame:
-        track_tags = self.data.track_tags\
-            .explode(TrackTags.tags.alias(TrackTag.tag),
-                     TrackTags.playlist_counts_per_tag.alias(TrackTag.matching_playlist_count))\
-            .rename({TrackTags.tag_relations_count: 'track.tag_relations_count'})
+        track_tags = self.data.tracks\
+            .explode(TrackTags.tags, TrackTags.playlist_counts_per_tag)\
+            .rename({TrackTags.tags: TrackTag.tag,
+                     TrackTags.playlist_counts_per_tag: TrackTag.matching_playlist_count,
+                     TrackTags.tag_relations_count: 'track.tag_relations_count'})
 
         # Do not perform search if tag_name_exact is None or empty, as that returns too many entries
         if not tag_name_exact:
@@ -1142,11 +1143,12 @@ class SearchEngine:
                 .filter(pl.col(TrackTag.tag).eq(tag_name_exact))
 
         return track_tags\
-            .join(self.data.tracks.select(Track.id, Stats.playlist_count), how='inner', on=Track.id)\
-            .join(self.find_tags(playlist_limit=0).select('full_tag', pl.col('playlist_count').alias('tag.playlist_count')),
-                  how='inner', left_on='tag', right_on='full_tag')\
-            .rename({Stats.playlist_count: 'track.playlist_count'})\
-            .sort('matching_playlist_count', descending=True)\
+            .join(self.data.tracks.select(Track.id, Track.name, Track.artists,
+                                          Stats.playlist_count().alias('track.playlist_count')),
+                  how='inner', on=Track.id)\
+            .join(self.find_tags(playlist_limit=0).select(Tag.name, Tag.playlist_count),
+                  how='inner', left_on=TrackTag.tag, right_on=Tag.name)\
+            .sort(TrackTag.matching_playlist_count, descending=True)\
             .select(TrackTag.Track.id,
                     TrackTag.Tag.name,
                     TrackTag.matching_playlist_count,
@@ -1159,8 +1161,8 @@ class SearchEngine:
                     (pl.col(TrackTag.matching_playlist_count) /
                      pl.col(TrackTag.Track.playlist_count)).alias(TrackTag.Track.playlist_percent),
                     TrackTag.Track.playlist_count,
-                    TrackTag.Track.name,
-                    TrackTag.Track.artists)\
+                    Track.name,
+                    Track.artists)\
             .slice(0, limit or None)
 
     def find_random_songs(
