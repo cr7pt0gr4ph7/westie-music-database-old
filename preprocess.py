@@ -427,6 +427,15 @@ def process_playlist_and_song_data(*, prepare_deduplication: bool = False):
     # PLAYLIST TRACKS #
     ###################
 
+    # Write pre-processed data to parquet file
+    write_to_parquet_file(
+        tracks,
+        TRACK_ORIGINAL_DATA_FILE if prepare_deduplication else TRACK_DATA_FILE)
+
+    ###################
+    # PLAYLIST TRACKS #
+    ###################
+
     playlist_tracks = typed_source_data.select(
         Playlist.id,
         Track.id,
