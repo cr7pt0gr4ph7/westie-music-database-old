@@ -48,6 +48,7 @@ PLAYLIST_ID_DTYPE = pl.String
 OWNER_ID_DTYPE = pl.String
 OWNER_NAME_DTYPE = pl.String
 
+
 # Simplistic file tracker to verify that operations
 # are invoked in the correct order.
 opened_files: set[str] = set()
@@ -715,49 +716,55 @@ def process_playlist_and_song_tags():
         .group_by('track.id', 'tag')\
         .agg(pl.col('tag').count().alias('playlist_count'))
 
-    temp_file = TEMP_DATA_DIR + 'temp_track_tags.parquet'
-    write_to_parquet_file(track_tags, temp_file)
-    track_tags = scan_parquet_file(temp_file)
+    with TempFileTracker() as temp_files:
+        temp_file = temp_files.register_for_deletion(TEMP_DATA_DIR + 'temp_track_tags.parquet')
+        write_to_parquet_file(track_tags, temp_file)
+        track_tags = scan_parquet_file(temp_file)
 
-    temp_file = TEMP_DATA_DIR + 'temp_track_tags_by_track_id.parquet'
-    track_tags_by_track_id = track_tags.sort('track.id')
-    write_to_parquet_file(track_tags_by_track_id, temp_file)
-    track_tags_by_track_id = scan_parquet_file(temp_file)
+        temp_file = TEMP_DATA_DIR + 'temp_track_tags_by_track_id.parquet'
+        track_tags_by_track_id = track_tags.sort('track.id')
+        write_to_parquet_file(track_tags_by_track_id, temp_file)
+        track_tags_by_track_id = scan_parquet_file(temp_file)
 
-    def process_track_tags_batch(tracks_batch: pl.LazyFrame) -> pl.LazyFrame:
-        return track_tags_by_track_id\
-            .join(tracks_batch, how='semi', on='track.id')\
-            .group_by('track.id')\
-            .agg(pl.col('tag').sort_by('playlist_count', descending=True).head(20),
-                 pl.col('playlist_count').sort(descending=True).head(20).alias('playlist_counts'),
-                 pl.col('playlist_count').sort(descending=True).head(20).sum())\
-            .join(tracks_batch.select('track.id', 'track.name', 'track.artists'), how='inner', on='track.id')
+        def process_track_tags_batch(tracks_batch: pl.LazyFrame) -> pl.LazyFrame:
+            return track_tags_by_track_id\
+                .join(tracks_batch, how='semi', on='track.id')\
+                .group_by('track.id')\
+                .agg(pl.col('tag').sort_by('playlist_count', descending=True).head(20),
+                    pl.col('playlist_count').sort(descending=True).head(20).alias('playlist_counts'),
+                    pl.col('playlist_count').sort(descending=True).head(20).sum())\
+                .join(tracks_batch.select('track.id', 'track.name', 'track.artists'), how='inner', on='track.id')
 
-    def process_track_tags_in_batches():
-        row_count = tracks.select(pl.len()).collect().item()
-        batch_size = 10000  # Higher batch sizes are faster but have a righer OOM risk
-        batch_count = int(math.ceil(row_count / batch_size))
+        def temp_file_for_index(index: int) -> str:
+            return TEMP_DATA_DIR + f'temp_tag_batch_{index}.parquet'
 
-        print(f"Processing {row_count:,} tracks in {batch_count:,} batches of {batch_size:,} items...")
+        @with_temp_files
+        def process_track_tags_in_batches(batch_temp_files: TempFileTracker):
+            row_count = tracks.select(pl.len()).collect().item()
+            batch_size = 10000  # Higher batch sizes are faster but have a righer OOM risk
+            batch_count = int(math.ceil(row_count / batch_size))
 
-        for batch_index in range(0, batch_count):
-            batch_start = batch_index * batch_size
-            print(f"Processing batch {batch_index:,}/{batch_count:,}")
-            batch_result = process_track_tags_batch(tracks.slice(batch_start, batch_size))\
-                .sort('track.id')
-            write_to_parquet_file(batch_result, TEMP_DATA_DIR + f'temp_tag_batch_{batch_index}.parquet')
+            print(f"Processing {row_count:,} tracks in {batch_count:,} batches of {batch_size:,} items...")
 
-        print("Merging batches...")
+            for batch_index in range(0, batch_count):
+                batch_start = batch_index * batch_size
+                print(f"Processing batch {batch_index:,}/{batch_count:,}")
+                batch_result = process_track_tags_batch(tracks.slice(batch_start, batch_size))\
+                    .sort('track.id')
+                temp_file = batch_temp_files.register_for_deletion(temp_file_for_index(batch_index))
+                write_to_parquet_file(batch_result, temp_file)
 
-        merged: pl.LazyFrame | None = None
-        for batch_index in range(0, batch_count):
-            batch_data = scan_parquet_file(TEMP_DATA_DIR + f'temp_tag_batch_{batch_index}.parquet')
-            merged = (batch_data if merged is None else
-                      merged.merge_sorted(batch_data, 'track.id'))
+            print("Merging batches...")
 
-        write_to_parquet_file(merged, TRACK_TAGS_DATA_FILE)
+            merged: pl.LazyFrame | None = None
+            for batch_index in range(0, batch_count):
+                batch_data = scan_parquet_file(temp_file_for_index(batch_index))
+                merged = (batch_data if merged is None else
+                          merged.merge_sorted(batch_data, 'track.id'))
 
-    process_track_tags_in_batches()
+            write_to_parquet_file(merged, TRACK_TAGS_DATA_FILE)
+
+        process_track_tags_in_batches()
 
 
 def process_everything(merge_duplicates: bool = True):
