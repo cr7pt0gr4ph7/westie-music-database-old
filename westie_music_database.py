@@ -60,7 +60,7 @@ def wcs_specific(df_: pl.DataFrame):
 # makes it so streamlit doesn't have to reload for every sesson.
 @st.cache_resource
 def load_notes():
-    return (pl.scan_csv('processed_data/data_notes.csv')
+    return (pl.scan_csv('unprocessed_data_huggingface/data_notes.csv')
             .rename({'Artist': Track.artist_names, 'Song': Track.name})
             .with_columns(pl.col([Track.name, Track.artist_names]).cast(pl.Categorical))
             )
@@ -123,7 +123,7 @@ st.link_button("Help fill in country info!",
 # def sample_of_raw_data():
 #     return (df
 #             # .with_columns(pl.col(Track.artist_names).cast(pl.String))
-#             .join(pl.scan_parquet('processed_data/data_song_bpm.parquet')
+#             .join(pl.scan_parquet('processed_data_huggingface/data_song_bpm.parquet')
 #                   .with_columns(pl.col([Track.name, Track.artist_names]).cast(pl.Categorical)),
 #                   how='left', on=[Track.name, Track.artist_names])
 #             # .with_columns(pl.col(Track.artist_names).cast(pl.Categorical))
@@ -748,7 +748,7 @@ if geo_region_toggle:
     if region_selectbox != 'Select One':
         st.markdown(f"#### What are the most popular songs only played in {region_selectbox}?")
 
-        region_df = (pl.scan_parquet('processed_data/data_unique_per_region.parquet')
+        region_df = (pl.scan_parquet('processed_data_huggingface/data_unique_per_region.parquet')
                      #  .pipe(wcs_specific)
                      .filter(pl.col('region').cast(pl.String) == region_selectbox,
                              # pl.col('geographic_region_count').eq(1)
